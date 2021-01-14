@@ -214,47 +214,6 @@ app.post('/signup/google',async (req,res)=>{
             }
         })
     }
-    // authGoogle(idToken,oauthClient,GOOGLE_CLIENT_ID)
-    //     .then(res=>{
-    //         console.log('userDetails',res)
-    //         email = res.email
-    //         name = res.firstname + ' ' + res.lastname
-    //         picture = res.picture
-    //         return client.db(MONGO_DB).collection(MONGO_COL_USERS).findOne({user:email})
-            
-    //     })
-    //     .then(data=>{
-    //         console.log('mongo result',data)
-    //         userInfo = generateUserInfo(email,name,data.role)
-    //         if(data!=null){
-    //             console.log('user info',userInfo)
-    //             // generate JWT token
-    //             const token = generateToken(jwt,userInfo,TOKEN_SECRET)
-    //             res.status(200)
-    //             res.type('application/json')
-    //             res.json({ message: `Login in at ${new Date()}`, token,role:data.role })
-    //         } else {
-    //             client.db(MONGO_DB).collection(MONGO_COL_USERS).insertOne(userInfo).then(data=>{
-    //                 console.log('new user',data)
-    //                 const user = {
-    //                     username: email,
-    //                     name,
-    //                     loginTime: (new Date()).toString(),
-    //                     role: 0
-    //                 }
-    //                 console.log('user info',user)
-    //                 // generate JWT token
-    //                 const token = generateToken(jwt,user,TOKEN_SECRET)
-    //                 res.status(200)
-    //                 res.type('application/json')
-    //                 res.json({ message: `Login in at ${new Date()}`, token,role:user.role })
-    //             })
-    //         }
-    //     })
-    //     .catch(e=>{
-            
-    //     })
-
 
 })
 
@@ -459,8 +418,8 @@ app.post("/create-checkout-session", async (req, res) => {
             line_items: line_items,
             client_reference_id:user,
             customer_email:user,
-            success_url: 'https://agile-sea-64761.herokuapp.com/#/payment-status?session_id={CHECKOUT_SESSION_ID}&status=success',
-            cancel_url: 'https://agile-sea-64761.herokuapp.com/#/payment-status?session_id={CHECKOUT_SESSION_ID}&status=fail',
+            success_url: 'https://sgmamashop.herokuapp.com/#/payment-status?session_id={CHECKOUT_SESSION_ID}&status=success',
+            cancel_url: 'https://sgmamashop.herokuapp.com/#/payment-status?session_id={CHECKOUT_SESSION_ID}&status=fail',
         });
         console.log('session',session)
         const order = makeOrder(user,session,cart)
@@ -469,19 +428,10 @@ app.post("/create-checkout-session", async (req, res) => {
 
         const insert1 = client.db(MONGO_DB).collection(MONGO_COL_ORDERS)
         const result1 = await insert1.insertOne(order,  {session: mongoSession} )
-        // if(!result1){
-        //     await mongoSession.abortTransaction()
-        //     console.log('unable to write to insert to Order Table')
-        //     throw new Error('unable to write ')
-        // }
+
         const insert2 = client.db(MONGO_DB).collection(MONGO_COL_SESSIONS)
         const result2 = await insert2.insertOne(sessionData, {session: mongoSession} )
-        // result2= null
-        // if(!result2){
-        //     await mongoSession.abortTransaction()
-        //     console.log('unable to write to insert to Session Table')
-        //     throw new Error('unable to write ')
-        // }
+
         console.log('first insert',result1.insertedCount)
         console.log('second insert',result2.insertedCount)
         await mongoSession.commitTransaction()
@@ -621,13 +571,6 @@ app.post('/item', upload.array('images',5), (req,res)=>{
 
 
 
-// app.use(function (err, req, res, next) {
-//     if (res.headersSent) {
-//         return next(err)
-//       }
-//     console.error('Error Catcher',err.stack)
-//     res.status(500).send(err)
-// })
 
 
 
@@ -636,39 +579,3 @@ client.connect().then(()=>{
         console.log(`APP listening on ${PORT} on ${new Date()}`)
     })
 })
-
-// // oauth2.0
-// const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
-// // authenticate with google
-// passport.use(new GoogleStrategy({
-//     clientID: process.env.GOOGLE_CLIENT_ID,
-//     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//     callbackURL: "/auth/google/callback"
-//   },
-//   (accessToken,refreshToken, profile, done) =>{
-//     return done(null, {profile,accessToken});
-//   }
-// ));
-
-
-
-
-// app.get('/auth/google',
-//     passport.authenticate('google',{scope:['email','profile']})
-// )
-
-
-// app.get('/auth/google/callback',
-//     passport.authenticate('google', {
-//         session: false,
-//         failureRedirect: '/auth/google'
-//     }),
-//     (req, res) => {
-//         const user = req.user
-//         console.log('user data',user)
-//         console.log('user data',user['profile']['emails'])
-//         console.log('user data',user['profile']['photos'])
-//         res.send('login success')
-
-//     })
